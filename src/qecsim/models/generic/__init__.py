@@ -13,3 +13,4 @@ from ._biasederrormodel import BiasedYXErrorModel  # noqa: F401
 from ._fileerrormodel import FileErrorModel  # noqa: F401
 from ._naivedecoder import NaiveDecoder  # noqa: F401
 from ._sliceerrormodel import CenterSliceErrorModel  # noqa: F401
+from ._iniderrormodel import INIDErrorModel  # noqa: F401

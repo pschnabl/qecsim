@@ -57,12 +57,7 @@ class INIDErrorModel(ErrorModel):
         p_y = p_x
         p_z = (2 - gamma - 2*np.sqrt( 1 - gamma - (1-gamma)*lambda_ )) / 4
         p_i = 1 - p_x - p_y - p_z
-        
-        # check if all probabilities for each qubit sum to 1
-        for n in range(len(self._T_1)):
-            if not np.isclose(p_x[n] + p_y[n] + p_z[n] + p_i[n], 1):
-                raise ValueError("Probabilities for each qubit must sum to 1.")
-        
+                
         return (p_i, p_x, p_y, p_z)
         
     def generate(self, code, t, rng=None):

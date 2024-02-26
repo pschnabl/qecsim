@@ -9,7 +9,7 @@ from qecsim.model import ErrorModel, cli_description
 
 class INIDErrorModel(ErrorModel):
     """
-    Implements a Independent and non-identically distributed (i.ni.d.) error model, where every qubit experiences
+    Implements an independent and non-identically distributed (i.ni.d.) error model, where every qubit experiences
     a different probability of suffering a Pauli error dependent on its individual relaxation and dephasing times T_1 and T_2.
     """
     def __init__(self, T_1, T_2):
@@ -71,8 +71,8 @@ class INIDErrorModel(ErrorModel):
 
         :param code: Stabilizer code.
         :type code: StabilizerCode
-        :param probability: Overall probability of an error on a single qubit.
-        :type probability: float
+        :param t: Time related to the overall probability of an error on a single qubit.
+        :type t: float
         :param rng: Random number generator. (default=None resolves to numpy.random.default_rng())
         :type rng: numpy.random.Generator
         :return: New error as binary symplectic vector.

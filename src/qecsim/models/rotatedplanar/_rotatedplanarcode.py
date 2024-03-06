@@ -254,7 +254,7 @@ class RotatedPlanarCode(StabilizerCode):
     @functools.lru_cache()
     def _virtual_plaquette_indices(self):
         """
-        Return two lists of the virtual plaquette indices of the Z and X sub-lattices.
+        Return two lists of the virtual plaquette indices of the Z and X sub-lattices. First list corresponds to Z plaquettes and second to X plaquettes.
 
         Notes:
 
@@ -265,8 +265,8 @@ class RotatedPlanarCode(StabilizerCode):
         :rtype: list of 2-tuple of int
         """
         max_site_x, max_site_y = self.site_bounds
-        virtual_x_plaquette_indices = [(x, -1) for x in range(0, max_site_x) if not x % 2] + [(x, max_site_y) for x in range(0, max_site_x) if x % 2]
-        virtual_z_plaquette_indices = [(-1, y) for y in range(0, max_site_y) if y % 2] + [(max_site_x, y) for y in range(0, max_site_y) if not y % 2]
+        virtual_x_plaquette_indices = [(x, -1) for x in range(0, max_site_x) if self.is_x_plaquette((x,-1))] + [(x, max_site_y) for x in range(0, max_site_x) if self.is_x_plaquette((x,max_site_y))]
+        virtual_z_plaquette_indices = [(-1, y) for y in range(0, max_site_y) if self.is_z_plaquette((-1,y))] + [(max_site_x, y) for y in range(0, max_site_y) if self.is_z_plaquette((max_site_x,y))]
         return virtual_z_plaquette_indices, virtual_x_plaquette_indices    
     
     def syndrome_to_plaquette_indices(self, syndrome):

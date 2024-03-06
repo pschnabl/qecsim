@@ -21,7 +21,7 @@ class RotatedPlanarMWPMDecoder(Decoder):
     * A graph between plaquettes is built with weights given by: :meth:`distance`.
     * A MWPM algorithm is used to match plaquettes into pairs.
     * A recovery operator is constructed by applying the shortest path between matching plaquette pairs using:
-      :meth:`_path_operator` and returned. # TODO
+      :meth:`_path_operator` and returned.
     """
     def __init__(self):
         """
@@ -197,7 +197,7 @@ class RotatedPlanarMWPMDecoder(Decoder):
         x_subgraph = self._create_subgraph(code, x_syndrome_plaquettes)
         z_subgraph = self._create_subgraph(code, z_syndrome_plaquettes)
         
-        # Find MWPM edges for each subgraph: output is a set e.g.: {((2, 3), (1, 4)), ((3, 4), (4, 5)), ((1, 6), (2, 5))}
+        # Find MWPM edges for each subgraph: output is a set of matched plaquette indices e.g.: {((2, 3), (1, 4)), ((3, 4), (4, 5)), ((1, 6), (2, 5))}
         mwpm_x_subgraph = gt.mwpm(x_subgraph)
         mwpm_z_subgraph = gt.mwpm(z_subgraph)
         

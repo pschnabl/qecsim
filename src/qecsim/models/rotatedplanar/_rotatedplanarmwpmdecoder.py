@@ -1,5 +1,6 @@
 import functools
 import itertools
+import numpy as np
 from scipy.spatial import distance
 
 from qecsim import graphtools as gt
@@ -57,6 +58,27 @@ class RotatedPlanarMWPMDecoder(Decoder):
         """
         return distance.chebyshev(a_index, b_index) # Chessboard distance, diagonal moves are allowed and have a distance of 1.
 
+    @functools.lru_cache()
+    def closest_virtual_plaquette(self, code, plaquette_index):
+        """
+        Return the closest virtual plaquette index to the given plaquette index according to the distance method.
+
+        :param plaquette_index: A plaquette index in the format (x, y).
+        :type plaquette_index: 2-tuple of int
+        :return: The closest virtual plaquette index in the format (x, y).
+        :rtype: 2-tuple of int
+        """
+        virtual_z_plaquettes, virtual_x_plaquettes = code._virtual_plaquette_indices
+        
+        if code.is_z_plaquette(plaquette_index):
+            dis = [self.distance(plaquette_index, index) for index in virtual_z_plaquettes]    
+            return virtual_z_plaquettes[np.argmin(dis)]    
+        elif code.is_x_plaquette(plaquette_index):
+            dis = [self.distance(plaquette_index, index) for index in virtual_x_plaquettes]    
+            return virtual_x_plaquettes[np.argmin(dis)]
+        else:
+            raise ValueError('Invalid plaquette index')
+    
     def _create_subgraph(self, code, syndrome_plaquettes):
         """Create a subgraph for decoding from either X-type or Z-type syndrom plaquette indices.
 
@@ -79,7 +101,7 @@ class RotatedPlanarMWPMDecoder(Decoder):
 
         # Add an edge between each syndrome plaquette and its closest virtual plaquette            
         for index in syndrome_plaquettes:
-            closest_virtual_plaquette = code.closest_virtual_plaquette(index)
+            closest_virtual_plaquette = self.closest_virtual_plaquette(code, index)
             vindices.add(closest_virtual_plaquette)
             graph.add_edge(index, closest_virtual_plaquette, weight=self.distance(index, closest_virtual_plaquette)) 
 
@@ -93,7 +115,7 @@ class RotatedPlanarMWPMDecoder(Decoder):
 
         # Add zero weight edges between all virtual nodes
         for a_index, b_index in itertools.combinations(vindices, 2): # iterates over all pairs of indices of the virtual plaquettes
-            graph.add_edge(a_index, b_index, 0)
+            graph.add_edge(a_index, b_index, weight=0)
             
         return graph
     

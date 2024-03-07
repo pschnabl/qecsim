@@ -265,9 +265,22 @@ class RotatedPlanarCode(StabilizerCode):
         :rtype: list of 2-tuple of int
         """
         max_site_x, max_site_y = self.site_bounds
-        virtual_x_plaquette_indices = [(x, -1) for x in range(0, max_site_x) if self.is_x_plaquette((x,-1))] + [(x, max_site_y) for x in range(0, max_site_x) if self.is_x_plaquette((x,max_site_y))]
-        virtual_z_plaquette_indices = [(-1, y) for y in range(0, max_site_y) if self.is_z_plaquette((-1,y))] + [(max_site_x, y) for y in range(0, max_site_y) if self.is_z_plaquette((max_site_x,y))]
-        return virtual_z_plaquette_indices, virtual_x_plaquette_indices    
+        virtual_x_plaquette_indices = []
+        virtual_z_plaquette_indices = []
+
+        for x in range(-1, max_site_x+1):
+            if self.is_x_plaquette((x,-1)):
+                virtual_x_plaquette_indices.append((x, -1))
+            if self.is_x_plaquette((x, max_site_y)):
+                virtual_x_plaquette_indices.append((x, max_site_y))
+
+        for y in range(-1, max_site_y+1):
+            if self.is_z_plaquette((-1, y)):
+                virtual_z_plaquette_indices.append((-1, y))
+            if self.is_z_plaquette((max_site_x, y)):
+                virtual_z_plaquette_indices.append((max_site_x, y))
+
+        return virtual_z_plaquette_indices, virtual_x_plaquette_indices
     
     def syndrome_to_plaquette_indices(self, syndrome):
         """
@@ -279,27 +292,6 @@ class RotatedPlanarCode(StabilizerCode):
         :rtype: set of 2-tuple of int
         """
         return set(tuple(index) for index in np.array(self._plaquette_indices)[syndrome.nonzero()])
-
-    @functools.lru_cache()
-    def closest_virtual_plaquette(self, plaquette_index):
-        """
-        Return the closest virtual plaquette index to the given plaquette index.
-
-        :param plaquette_index: A plaquette index in the format (x, y).
-        :type plaquette_index: 2-tuple of int
-        :return: The closest virtual plaquette index in the format (x, y).
-        :rtype: 2-tuple of int
-        """
-        virtual_z_plaquettes, virtual_x_plaquettes = self._virtual_plaquette_indices
-        
-        if self.is_z_plaquette(plaquette_index):
-            dis = [distance.chebyshev(plaquette_index, index) for index in virtual_z_plaquettes]    
-            return virtual_z_plaquettes[np.argmin(dis)]    
-        elif self.is_x_plaquette(plaquette_index):
-            dis = [distance.chebyshev(plaquette_index, index) for index in virtual_x_plaquettes]    
-            return virtual_x_plaquettes[np.argmin(dis)]
-        else:
-            raise ValueError('Invalid plaquette index')
     
     def __eq__(self, other):
         if type(other) is type(self):

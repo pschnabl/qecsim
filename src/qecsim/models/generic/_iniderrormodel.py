@@ -29,8 +29,12 @@ class INIDErrorModel(ErrorModel):
             raise ValueError("T_1 must be a list of floats.")
         if not all(isinstance(x, float) for x in T_2):
             raise ValueError("T_2 must be a list of floats.")
-        self._T_1 = T_1
-        self._T_2 = T_2
+        # The condition T_2 <= 2*T_1 should be satisfied for all qubits to ensure that there are no negative probabilities.
+        if not all(T_2[n] <= 2*T_1[n] for n in range(len(T_1))):
+            raise ValueError("The condition T_2 <= 2*T_1 should be satisfied for all qubits to ensure that there are no negative probabilities.")
+        
+        self._T_1 = np.array(T_1)
+        self._T_2 = np.array(T_2)
     
     @functools.lru_cache()
     def probability_distribution(self, t):
@@ -45,19 +49,10 @@ class INIDErrorModel(ErrorModel):
         :raises NotImplementedError: Unless implemented in a subclass.
         """
         # for each qubit n, calculate the probability of each Pauli error
-        # p_x = 1/4 * (1 - np.exp(-t / self._T_2))
-        # p_y = p_x
-        # p_z = 1/4 * (1 + np.exp(-t / self._T_1) - 2*np.exp(-t / self._T_2))
-        # p_i = 1 - p_x - p_y - p_z
-        
-        gamma = 1 - np.exp(-t / self._T_1)
-        lambda_ = 1 - np.exp(-2*t / self._T_2)
-        
-        p_x = gamma / 4
+        p_x = 1/4 * (1 - np.exp(-t / self._T_1))
         p_y = p_x
-        p_z = (2 - gamma - 2*np.sqrt( 1 - gamma - (1-gamma)*lambda_ )) / 4
-        p_i = 1 - p_x - p_y - p_z
-                
+        p_z = 1/4 * (1 + np.exp(-t / self._T_1) - 2*np.exp(-t / self._T_2))
+        p_i = 1 - p_x - p_y - p_z                
         return (p_i, p_x, p_y, p_z)
         
     def generate(self, code, t, rng=None):
@@ -76,9 +71,7 @@ class INIDErrorModel(ErrorModel):
         rng = np.random.default_rng() if rng is None else rng
         n_qubits = code.n_k_d[0]
         p_i, p_x, p_y, p_z = self.probability_distribution(t)
-        
         error_pauli = ''.join([rng.choice(('I', 'X', 'Y', 'Z'), p=(p_i[n], p_x[n], p_y[n], p_z[n])) for n in range(n_qubits)])       
-        
         return pt.pauli_to_bsf(error_pauli)
 
 

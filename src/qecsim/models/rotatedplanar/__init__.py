@@ -9,3 +9,4 @@ from ._rotatedplanarmpsdecoder import RotatedPlanarMPSDecoder  # noqa: F401
 from ._rotatedplanarrmpsdecoder import RotatedPlanarRMPSDecoder  # noqa: F401
 from ._rotatedplanarsmwpmdecoder import RotatedPlanarSMWPMDecoder  # noqa: F401
 from ._rotatedplanarmwpmdecoder import RotatedPlanarMWPMDecoder  # noqa: F401
+from ._rotatedplanarreweightedmwpmdecoder import RotatedPlanarReweightedMWPMDecoder  # noqa: F401

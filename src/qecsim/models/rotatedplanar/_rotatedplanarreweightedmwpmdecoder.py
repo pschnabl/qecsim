@@ -12,6 +12,7 @@ class RotatedPlanarReweightedMWPMDecoder(RotatedPlanarMWPMDecoder):
     The edges between plaquettes in the Z and X check graphs are reweighted according to the T1 and T2
     times of the corresponding qubits respectively.    
     """
+    # TODO: check the condition T_2 <= 2*T_1
     def __init__(self, code, t, T_1, T_2):
         """
         Initialise decoder for the rotated planar code with time t, and the T_1 and T_2 times of each qubit.
